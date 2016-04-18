@@ -2,7 +2,7 @@
 //Author’s name:        Vishal Guleria (300813391), Vinay Bhardwaj (300825097) and Jagpreet Jattana
 //Date last Modified    April 8,2016
 //Program description   Group Project - Battle Truck
-//Revision History      Part 2
+//Revision History      Final
 var __extends = (this && this.__extends) || function (d, b) {
     for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
     function __() { this.constructor = d; }
@@ -23,9 +23,739 @@ var scenes;
      */
     var Play3 = (function (_super) {
         __extends(Play3, _super);
+        /**
+         * @constructor
+         */
         function Play3() {
-            _super.apply(this, arguments);
+            _super.call(this);
+            this.cointCount = 4;
+            this.stoneCount = 4;
+            this.randomMin = 10;
+            this.randomMax = 20;
+            this.randomMin2 = 10;
+            this.randomMax2 = 20;
+            this.switchAttack = 0;
+            this._initialize();
+            this.start();
         }
+        // PRIVATE METHODS ++++++++++++++++++++++++++++++++++++++++++
+        /**
+         * Sets up the initial canvas for the play scene
+         *
+         * @method setupCanvas
+         * @return void
+         */
+        Play3.prototype._setupCanvas = function () {
+            canvas.setAttribute("width", config.Screen.WIDTH.toString());
+            canvas.setAttribute("height", (config.Screen.HEIGHT * 0.1).toString());
+            canvas.style.backgroundColor = "#000000";
+            canvas.style.opacity = "0.5";
+            canvas.style.position = "absolute";
+        };
+        /**
+         * The initialize method sets up key objects to be used in the scene
+         *
+         * @method _initialize
+         * @returns void
+         */
+        Play3.prototype._initialize = function () {
+            // Create to HTMLElements
+            this.blocker = document.getElementById("blocker");
+            this.instructions = document.getElementById("instructions");
+            this.blocker.style.display = "block";
+            // setup canvas for menu scene
+            this._setupCanvas();
+            this.prevTime = 0;
+            this.stage = new createjs.Stage(canvas);
+            this.velocity = new Vector3(0, 0, 0);
+            // setup a THREE.JS Clock object
+            this.clock = new Clock();
+            // Instantiate Game Controls
+            this.keyboardControls = new objects.KeyboardControls();
+            this.mouseControls = new objects.MouseControls();
+        };
+        /**
+         * This method sets up the scoreboard for the scene
+         *
+         * @method setupScoreboard
+         * @returns void
+         */
+        Play3.prototype.setupScoreboard = function () {
+            // Add Lives Label
+            this.livesLabel = new createjs.Text("LIVES: " + livesValue, "40px Algerian", "#ffffff");
+            this.livesLabel.x = config.Screen.WIDTH * 0.1;
+            this.livesLabel.y = (config.Screen.HEIGHT * 0.15) * 0.20;
+            this.stage.addChild(this.livesLabel);
+            console.log("Added Lives Label to stage");
+            // Add Score Label
+            this.scoreLabel = new createjs.Text("SCORE: " + scoreValue, "40px Algerian", "#ffffff");
+            this.scoreLabel.x = config.Screen.WIDTH * 0.8;
+            this.scoreLabel.y = (config.Screen.HEIGHT * 0.15) * 0.20;
+            this.stage.addChild(this.scoreLabel);
+            console.log("Added Score Label to stage");
+        };
+        /**
+         * Add a spotLight to the scene
+         *
+         * @method addSpotLight
+         * @return void
+         */
+        Play3.prototype.addSpotLight = function () {
+            // Spot Light
+            // Spot Light
+            this.spotLight = new SpotLight(0xffffff);
+            // spotLight.position.set(0, 40, 0);
+            this.spotLight.position.set(150, 170, -70);
+            this.spotLight.castShadow = true;
+            this.spotLight.intensity = 2;
+            // spotLight.lookAt(new Vector3(0, 0, 0));
+            this.spotLight.lookAt(new Vector3(150, 0, -70));
+            this.spotLight.shadowCameraNear = 2;
+            this.spotLight.shadowCameraFar = 200;
+            this.spotLight.shadowCameraLeft = -5;
+            this.spotLight.shadowCameraRight = 5;
+            this.spotLight.shadowCameraTop = 5;
+            this.spotLight.shadowCameraBottom = -5;
+            this.spotLight.shadowMapWidth = 2048;
+            this.spotLight.shadowMapHeight = 2048;
+            this.spotLight.shadowDarkness = 0.5;
+            this.spotLight.name = "Spot Light";
+            this.add(this.spotLight);
+            // spotLight2=new SpotLight(0xffffff);
+            // spotLight2 = spotLight;
+            this.spotLight2 = new SpotLight(0xffffff);
+            this.spotLight2.position.set(400, 170, -190);
+            this.spotLight2.lookAt(new Vector3(300, 0, -190));
+            // spotLight2.position.set(150, 170, -70);
+            this.spotLight2.castShadow = true;
+            this.spotLight2.intensity = 2;
+            this.spotLight2.shadowCameraNear = 2;
+            this.spotLight2.shadowCameraFar = 200;
+            this.spotLight2.shadowCameraLeft = -5;
+            this.spotLight2.shadowCameraRight = 5;
+            this.spotLight2.shadowCameraTop = 5;
+            this.spotLight2.shadowCameraBottom = -5;
+            this.spotLight2.shadowMapWidth = 2048;
+            this.spotLight2.shadowMapHeight = 2048;
+            this.spotLight2.shadowDarkness = 0.5;
+            this.spotLight2.name = "Spot Light";
+            this.add(this.spotLight2);
+        };
+        /**
+         * Add a ground plane to the scene
+         *
+         * @method addGround
+         * @return void
+         */
+        /**
+         * Adds the player controller to the scene
+         *
+         * @method addPlayer
+         * @return void
+         */
+        Play3.prototype.addPlayer = function () {
+            // Truck Body Object
+            this.bodyTexture = new THREE.TextureLoader().load('../../Assets/images/Body.jpg');
+            this.bodyTexture.wrapS = THREE.RepeatWrapping;
+            this.bodyTexture.wrapT = THREE.RepeatWrapping;
+            this.bodyTexture.repeat.set(2, 2);
+            // Bruck bonnut Object
+            this.frontTexture = new THREE.TextureLoader().load('../../Assets/images/Front.jpg');
+            this.frontTexture.wrapS = THREE.RepeatWrapping;
+            this.frontTexture.wrapT = THREE.RepeatWrapping;
+            this.frontTexture.repeat.set(1, 1);
+            this.frontTextureNormal = new THREE.TextureLoader().load('../../Assets/images/FrontNormal.png');
+            this.frontTextureNormal.wrapS = THREE.RepeatWrapping;
+            this.frontTextureNormal.wrapT = THREE.RepeatWrapping;
+            this.frontTextureNormal.repeat.set(1, 1);
+            this.frontMaterial = new PhongMaterial();
+            this.frontMaterial.map = this.frontTexture;
+            this.frontMaterial.bumpMap = this.frontTextureNormal;
+            this.frontMaterial.bumpScale = 0.2;
+            // Truck Windshield Object
+            this.glassTexture = new THREE.TextureLoader().load('../../Assets/images/Glass.jpg');
+            this.glassTexture.wrapS = THREE.RepeatWrapping;
+            this.glassTexture.wrapT = THREE.RepeatWrapping;
+            this.glassTexture.repeat.set(1, 1);
+            // Left headlight Object
+            this.lLightTexture = new THREE.TextureLoader().load('../../Assets/images/leftLight.png');
+            this.lLightTexture.wrapS = THREE.RepeatWrapping;
+            this.lLightTexture.wrapT = THREE.RepeatWrapping;
+            this.lLightTexture.repeat.set(1, 1);
+            // Right Headlight Object
+            this.rLightTexture = new THREE.TextureLoader().load('../../Assets/images/rightLight.png');
+            this.rLightTexture.wrapS = THREE.RepeatWrapping;
+            this.rLightTexture.wrapT = THREE.RepeatWrapping;
+            this.rLightTexture.repeat.set(1, 1);
+            // Brak Lights Object
+            this.breakLightTexture = new THREE.TextureLoader().load('../../Assets/images/breakLight.png');
+            this.breakLightTexture.wrapS = THREE.RepeatWrapping;
+            this.breakLightTexture.wrapT = THREE.RepeatWrapping;
+            this.breakLightTexture.repeat.set(1, 1);
+            // Universal Tire Object
+            // this.playersGeometry = new SphereGeometry(0.5,20, 20);
+            // this.playerMaterial = Physijs.createMaterial(new PhongMaterial({ color: 0x000000 }), 0.4, 0);
+            // this.player = new Physijs.SphereMesh(this.playersGeometry, this.playerMaterial, 1);
+            // this.player.position.set(0, 0, -70);
+            // this.player.rotation.set(0, 3.14159, 0);
+            // this.player.receiveShadow = true;
+            // this.player.castShadow = true;
+            // this.player.name = "Player";
+            // Truck Body Object
+            this.playerGeometry1 = new BoxGeometry(5, 5, 5);
+            this.playerMaterial1 = Physijs.createMaterial(this.frontMaterial, 0.4, 0);
+            this.player1 = new Physijs.BoxMesh(this.playerGeometry1, this.playerMaterial1, 1);
+            this.player1.position.set(0, 7, 10);
+            this.player1.rotation.set(0, 0, 0);
+            this.player1.receiveShadow = true;
+            this.player1.castShadow = true;
+            this.player1.name = "Player2";
+            //this.player.add(this.player1);
+            // Truck Bonet Object
+            this.playerGeometrya = new BoxGeometry(5, 3, 3);
+            this.playerMateriala = Physijs.createMaterial(new PhongMaterial({ map: this.frontTexture }), 0.4, 0);
+            this.playera = new Physijs.ConvexMesh(this.playerGeometrya, this.playerMateriala, 1);
+            this.playera.position.set(0, -1, -4);
+            this.playera.receiveShadow = true;
+            this.playera.castShadow = true;
+            this.playera.name = "Player2";
+            this.player1.add(this.playera);
+            // Truck Windshield Object
+            this.playerGeometryb = new BoxGeometry(4, 2, 0.01);
+            this.playerMaterialb = Physijs.createMaterial(new PhongMaterial({ map: this.glassTexture }), 0.4, 0);
+            this.playerb = new Physijs.BoxMesh(this.playerGeometryb, this.playerMaterialb, 1);
+            this.playerb.position.set(0, 1.5, -2.5);
+            this.playerb.receiveShadow = true;
+            this.playerb.castShadow = true;
+            this.playerb.name = "Playerb";
+            this.player1.add(this.playerb);
+            console.log("Added Player1 to Scene");
+            this.playerbb = new Physijs.BoxMesh(this.playerGeometryb, this.playerMaterialb, 1);
+            this.playerbb.position.set(0, 1.3, 2.5);
+            this.playerbb.receiveShadow = true;
+            this.playerbb.castShadow = true;
+            this.playerbb.name = "Playerb";
+            this.player1.add(this.playerbb);
+            console.log("Added Player1 to Scene");
+            // Truck Headlight Object
+            this.playerGeometryc = new BoxGeometry(1, .5, 0.01);
+            this.playerMaterialc = Physijs.createMaterial(new PhongMaterial({ map: this.lLightTexture }), 0.4, 0);
+            this.playerMateriald = Physijs.createMaterial(new PhongMaterial({ map: this.rLightTexture }), 0.4, 0);
+            this.playerc = new Physijs.BoxMesh(this.playerGeometryc, this.playerMaterialc, 1);
+            this.playerc.position.set(1.5, -1.5, -5.5);
+            this.playerc.receiveShadow = true;
+            this.playerc.castShadow = true;
+            this.playerc.name = "Player2";
+            this.player1.add(this.playerc);
+            console.log("Added Player1 to Scene");
+            this.playerd = new Physijs.BoxMesh(this.playerGeometryc, this.playerMateriald, 1);
+            this.playerd.position.set(-1.5, -1.5, -5.5);
+            this.playerd.receiveShadow = true;
+            this.playerd.castShadow = true;
+            this.playerd.name = "Player2";
+            this.player1.add(this.playerd);
+            console.log("Added Player1 to Scene");
+            // Truck Break lights Object
+            this.playerGeometrye = new BoxGeometry(1, 0.5, 0.01);
+            this.playerMateriale = Physijs.createMaterial(new PhongMaterial({ map: this.breakLightTexture }), 0.4, 0);
+            this.playere = new Physijs.BoxMesh(this.playerGeometrye, this.playerMateriale, 1);
+            this.playere.position.set(-1.5, -1.5, 2.5);
+            this.playere.receiveShadow = true;
+            this.playere.castShadow = true;
+            this.playere.name = "Player2";
+            this.player1.add(this.playere);
+            console.log("Added Player1 to Scene");
+            this.playerf = new Physijs.BoxMesh(this.playerGeometrye, this.playerMateriale, 1);
+            this.playerf.position.set(1.5, -1.5, 2.5);
+            this.playerf.receiveShadow = true;
+            this.playerf.castShadow = true;
+            this.playerf.name = "Player2";
+            this.player1.add(this.playerf);
+            console.log("Added Player1 to Scene");
+            this.add(this.player1);
+        };
+        /**
+         * Add the death plane to the scene
+         *
+         * @method addDeathPlane
+         * @return void
+         */
+        Play3.prototype.addDeathPlane = function () {
+            this.deathPlaneGeometry = new BoxGeometry(500, 1, 500);
+            this.deathPlaneMaterial = Physijs.createMaterial(new MeshBasicMaterial({ color: 0xff0000 }), 0.4, 0.6);
+            // make deathPlane invisible during play - comment out next two lines during debugging
+            this.deathPlaneMaterial.transparent = true;
+            this.deathPlaneMaterial.opacity = 0;
+            this.deathPlane = new Physijs.BoxMesh(this.deathPlaneGeometry, this.deathPlaneMaterial, 0);
+            this.deathPlane.position.set(200, -10, -80);
+            this.deathPlane.name = "DeathPlane";
+            this.add(this.deathPlane);
+        };
+        /**
+         * Event Handler method for any pointerLockChange events
+         *
+         * @method pointerLockChange
+         * @return void
+         */
+        Play3.prototype.pointerLockChange = function (event) {
+            if (document.pointerLockElement === this.element) {
+                // enable our mouse and keyboard controls
+                this.keyboardControls.enabled = true;
+                this.mouseControls.enabled = true;
+                this.blocker.style.display = 'none';
+            }
+            else {
+                if (livesValue <= 0) {
+                    this.blocker.style.display = 'none';
+                    document.removeEventListener('pointerlockchange', this.pointerLockChange.bind(this), false);
+                    document.removeEventListener('mozpointerlockchange', this.pointerLockChange.bind(this), false);
+                    document.removeEventListener('webkitpointerlockchange', this.pointerLockChange.bind(this), false);
+                    document.removeEventListener('pointerlockerror', this.pointerLockError.bind(this), false);
+                    document.removeEventListener('mozpointerlockerror', this.pointerLockError.bind(this), false);
+                    document.removeEventListener('webkitpointerlockerror', this.pointerLockError.bind(this), false);
+                }
+                else {
+                    this.blocker.style.display = '-webkit-box';
+                    this.blocker.style.display = '-moz-box';
+                    this.blocker.style.display = 'box';
+                    this.instructions.style.display = '';
+                }
+                // disable our mouse and keyboard controls
+                this.keyboardControls.enabled = false;
+                this.mouseControls.enabled = false;
+                console.log("PointerLock disabled");
+            }
+        };
+        /**
+         * Event handler for PointerLockError
+         *
+         * @method pointerLockError
+         * @return void
+         */
+        Play3.prototype.pointerLockError = function (event) {
+            this.instructions.style.display = '';
+            console.log("PointerLock Error Detected!!");
+        };
+        // Check Controls Function
+        /**
+         * This method updates the player's position based on user input
+         *
+         * @method checkControls
+         * @return void
+         */
+        Play3.prototype.checkControls = function () {
+            if (this.keyboardControls.enabled) {
+                this.velocity = new Vector3();
+                var time = performance.now();
+                var delta = (time - this.prevTime) / 1000;
+                var direction = new Vector3(0, 0, 0);
+                if (this.keyboardControls.moveForward) {
+                    this.velocity.z -= 600.0 * delta;
+                }
+                if (this.keyboardControls.moveLeft) {
+                    this.velocity.x -= 400.0 * delta;
+                }
+                if (this.keyboardControls.moveBackward) {
+                    this.velocity.z += 600.0 * delta;
+                }
+                if (this.keyboardControls.moveRight) {
+                    this.velocity.x += 400.0 * delta;
+                }
+                if (this.isGrounded) {
+                    if (this.keyboardControls.jump) {
+                        this.velocity.y += 4000.0 * delta;
+                        if (this.player1.position.y > 4) {
+                            this.isGrounded = false;
+                        }
+                    }
+                }
+                this.player1.setDamping(0.7, 0.1);
+                // Changing player's rotation
+                this.player1.setAngularVelocity(new Vector3(0, this.mouseControls.yaw, 0));
+                direction.addVectors(direction, this.velocity);
+                direction.applyQuaternion(this.player1.quaternion);
+                if (Math.abs(this.player1.getLinearVelocity().x) < 20 && Math.abs(this.player1.getLinearVelocity().y) < 10) {
+                    this.player1.applyCentralForce(direction);
+                }
+                this.cameraLook();
+                // isGrounded ends
+                //reset Pitch and Yaw
+                this.mouseControls.pitch = 0;
+                this.mouseControls.yaw = 0;
+                this.prevTime = time;
+            } // Controls Enabled ends
+            else {
+                this.player1.setAngularVelocity(new Vector3(0, 0, 0));
+            }
+        };
+        Play3.prototype.addBridge = function () {
+            // Ground Object
+        };
+        Play3.prototype.addGround = function () {
+            this.groundTexture = new THREE.TextureLoader().load('../../Assets/images/road.jpg');
+            this.groundTexture.wrapS = THREE.RepeatWrapping;
+            this.groundTexture.wrapT = THREE.RepeatWrapping;
+            this.groundTexture.repeat.set(8, 8);
+            this.groundTextureNormal = new THREE.TextureLoader().load('../../Assets/images/road.jpg');
+            this.groundTextureNormal.wrapS = THREE.RepeatWrapping;
+            this.groundTextureNormal.wrapT = THREE.RepeatWrapping;
+            this.groundTextureNormal.repeat.set(8, 8);
+            this.groundMaterial = new PhongMaterial();
+            this.groundMaterial.map = this.groundTexture;
+            this.groundMaterial.bumpMap = this.groundTextureNormal;
+            this.groundMaterial.bumpScale = 0.2;
+            this.groundGeometry = new BoxGeometry(32, 1, 100);
+            this.groundPhysicsMaterial = Physijs.createMaterial(this.groundMaterial, 0, 0);
+            this.ground = new Physijs.ConvexMesh(this.groundGeometry, this.groundPhysicsMaterial, 0);
+            this.ground.receiveShadow = true;
+            this.ground.name = "Ground";
+            this.add(this.ground);
+            console.log("Added Burnt Ground to scene");
+            this.groundGeometry1 = new BoxGeometry(32, 1, 100);
+            this.ground1 = new Physijs.ConvexMesh(this.groundGeometry1, this.groundPhysicsMaterial, 0);
+            this.ground1.receiveShadow = true;
+            this.ground1.name = "Ground";
+            this.ground1.position.set(0, 0, -105);
+            this.add(this.ground1);
+            this.groundGeometry2 = new BoxGeometry(100, 1, 32);
+            this.ground2 = new Physijs.ConvexMesh(this.groundGeometry2, this.groundPhysicsMaterial, 0);
+            this.ground2.receiveShadow = true;
+            this.ground2.name = "Ground";
+            this.ground2.position.set(70, 0, -139);
+            this.add(this.ground2);
+            this.groundGeometry3 = new BoxGeometry(32, 1, 100);
+            this.ground3 = new Physijs.ConvexMesh(this.groundGeometry3, this.groundPhysicsMaterial, 0);
+            this.ground3.receiveShadow = true;
+            this.ground3.name = "Ground";
+            this.ground3.position.set(138, 0, -105);
+            this.add(this.ground3);
+            this.groundGeometry4 = new BoxGeometry(100, 1, 32);
+            this.ground4 = new Physijs.ConvexMesh(this.groundGeometry4, this.groundPhysicsMaterial, 0);
+            this.ground4.receiveShadow = true;
+            this.ground4.name = "Ground";
+            this.ground4.position.set(208, 0, -71);
+            this.add(this.ground4);
+            this.groundGeometry5 = new BoxGeometry(32, 1, 100);
+            this.ground5 = new Physijs.ConvexMesh(this.groundGeometry5, this.groundPhysicsMaterial, 0);
+            this.ground5.receiveShadow = true;
+            this.ground5.name = "Ground";
+            this.ground5.position.set(242, 0, -141);
+            this.add(this.ground5);
+            this.groundGeometry6 = new BoxGeometry(100, 1, 32);
+            this.ground6 = new Physijs.ConvexMesh(this.groundGeometry6, this.groundPhysicsMaterial, 0);
+            this.ground6.receiveShadow = true;
+            this.ground6.name = "Ground";
+            this.ground6.position.set(313, 0, -175);
+            this.add(this.ground6);
+            this.groundGeometry7 = new BoxGeometry(32, 1, 100);
+            this.ground7 = new Physijs.ConvexMesh(this.groundGeometry7, this.groundPhysicsMaterial, 0);
+            this.ground7.receiveShadow = true;
+            this.ground7.name = "Ground";
+            this.ground7.position.set(347, 0, -104);
+            this.add(this.ground7);
+            this.groundGeometry8 = new BoxGeometry(32, 1, 32);
+            this.ground8 = new Physijs.ConvexMesh(this.groundGeometry8, this.groundPhysicsMaterial, 0);
+            this.ground8.receiveShadow = true;
+            this.ground8.name = "Finish";
+            this.ground8.position.set(347, 0, -33);
+            this.add(this.ground8);
+            console.log("Added Ground to scene");
+        };
+        // Add the Coin to the scene
+        Play3.prototype.addCoinMesh = function (minX, maxX, minY, maxY) {
+            this.coins = new Array(); // Instantiate a convex mesh array
+            this.boxTexture = new THREE.TextureLoader().load('../../Assets/images/box.jpg');
+            this.boxTexture.wrapS = THREE.RepeatWrapping;
+            this.boxTexture.wrapT = THREE.RepeatWrapping;
+            this.boxTexture.repeat.set(1, 1);
+            this.boxTextureNormal = new THREE.TextureLoader().load('../../Assets/images/box.jpg');
+            this.boxTextureNormal.wrapS = THREE.RepeatWrapping;
+            this.boxTextureNormal.wrapT = THREE.RepeatWrapping;
+            this.boxTextureNormal.repeat.set(1, 1);
+            this.boxMatPh = new PhongMaterial();
+            this.boxMatPh.map = this.boxTexture;
+            this.boxMatPh.bumpMap = this.boxTextureNormal;
+            this.boxMatPh.bumpScale = 0.2;
+            this.boxMat = Physijs.createMaterial(this.boxMatPh, 0, 0);
+            this.boxGeometry = new BoxGeometry(4, 4, 4);
+            for (var count = 0; count < this.cointCount; count++) {
+                // coins[count] = new Physijs.ConvexMesh(geometry, coinMaterial, 0.5);
+                this.coins[count] = new Physijs.ConvexMesh(this.boxGeometry, this.boxMat, 0);
+                this.coins[count].receiveShadow = true;
+                this.coins[count].castShadow = true;
+                this.coins[count].name = "Coin";
+                this.setCoinPosition(this.coins[count], minX, maxX, minY, maxY);
+            }
+            //  });
+            console.log("Added Coin Mesh to Scene");
+        };
+        // Set Coin Position
+        Play3.prototype.setCoinPosition = function (coin, minX, maxX, minY, maxY) {
+            var randomPointX = Math.floor(Math.random() * (maxX - minX) + 1) + minX;
+            var randomPointZ = Math.floor(Math.random() * (maxY - minY) + 1) + minY;
+            var randomPointy = Math.floor(Math.random() * 30) + 30;
+            coin.position.set(randomPointX, 2, randomPointZ);
+            this.add(coin);
+        };
+        // Add the Stone to the scene
+        Play3.prototype.addStoneMesh = function () {
+            this.stones = new Array(); // Instantiate a convex mesh array
+            var stoneLoader = new THREE.JSONLoader().load("../../Assets/imported/missile.json", function (geometry) {
+                var phongMaterial = new PhongMaterial({ color: 0x736F6E });
+                phongMaterial.emissive = new THREE.Color(0x736F6E);
+                this.stones = new Array();
+                var stoneMaterial = Physijs.createMaterial((phongMaterial), 0.4, 0.6);
+                for (var count = 1; count < 7; count++) {
+                    console.log("Testing");
+                    this.stones[count] = new Physijs.ConvexMesh(geometry, stoneMaterial);
+                    this.stones[count].receiveShadow = true;
+                    this.stones[count].castShadow = true;
+                    this.stones[count].name = "Stone";
+                    play3.setStonePosition(this.stones[1]);
+                }
+            });
+            console.log("Added Stone Mesh to Scene");
+        };
+        // Set Stone Position
+        Play3.prototype.setStonePosition = function (stone) {
+            var randomPointZ = Math.floor(Math.random() * (this.randomMax - this.randomMin) + 1) - this.randomMin;
+            var randomPointX = Math.floor(Math.random() * 20) - 10;
+            var randomPointy = Math.floor(Math.random() * 60) + 30;
+            if (this.switchAttack == 0) {
+                stone.position.set(this.randomMax2, randomPointy, this.randomMin2);
+                this.switchAttack = 1;
+            }
+            else {
+                stone.position.set(this.randomMax, randomPointy, this.randomMin);
+                this.switchAttack = 0;
+            }
+            this.add(stone);
+        };
+        Play3.prototype.setMinMaX = function () {
+            this.randomMin = this.player1.position.getComponent(2);
+            this.randomMax = this.player1.position.getComponent(0);
+            this.randomMin2 = this.emplty.position.getComponent(2);
+            this.randomMax2 = this.emplty.position.getComponent(0);
+        };
+        // PUBLIC METHODS +++++++++++++++++++++++++++++++++++++++++++
+        /**
+         * The start method is the main method for the scene class
+         *
+         * @method start
+         * @return void
+         */
+        Play3.prototype.start = function () {
+            var _this = this;
+            createjs.Sound.stop();
+            // setup the class context to use within events
+            var self = this;
+            // Set Up Scoreboard
+            this.setupScoreboard();
+            //check to see if pointerlock is supported
+            this.havePointerLock = 'pointerLockElement' in document ||
+                'mozPointerLockElement' in document ||
+                'webkitPointerLockElement' in document;
+            // Check to see if we have pointerLock
+            if (this.havePointerLock) {
+                this.element = document.body;
+                this.instructions.addEventListener('click', function () {
+                    // Ask the user for pointer lock
+                    console.log("Requesting PointerLock");
+                    _this.element.requestPointerLock = _this.element.requestPointerLock ||
+                        _this.element.mozRequestPointerLock ||
+                        _this.element.webkitRequestPointerLock;
+                    _this.element.requestPointerLock();
+                });
+                document.addEventListener('pointerlockchange', this.pointerLockChange.bind(this), false);
+                document.addEventListener('mozpointerlockchange', this.pointerLockChange.bind(this), false);
+                document.addEventListener('webkitpointerlockchange', this.pointerLockChange.bind(this), false);
+                document.addEventListener('pointerlockerror', this.pointerLockError.bind(this), false);
+                document.addEventListener('mozpointerlockerror', this.pointerLockError.bind(this), false);
+                document.addEventListener('webkitpointerlockerror', this.pointerLockError.bind(this), false);
+            }
+            // Scene changes for Physijs
+            this.name = "Play Scene";
+            this.fog = new THREE.Fog(0xffffff, 0, 750);
+            this.setGravity(new THREE.Vector3(0, -10, 0));
+            // Add Spot Light to the scene
+            this.addSpotLight();
+            // Ground Object
+            this.addGround();
+            // Add custom coin imported from Blender
+            this.addCoinMesh(14, -14, 50, -50);
+            this.addCoinMesh(14, -14, -58, -153);
+            this.addCoinMesh(22, 118, -122, -153);
+            this.addCoinMesh(124, 152, -58, -153);
+            this.addCoinMesh(161, 257, -58, -85);
+            this.addCoinMesh(228, 250, -93, -189);
+            this.addCoinMesh(265, 361, -163, -189);
+            this.addCoinMesh(333, 361, -58, -151);
+            this.addStoneMesh();
+            // Add player controller
+            this.addPlayer();
+            // Add custom coin imported from Blender
+            //this.addCoinMesh();
+            // Add death plane to the scene
+            this.addDeathPlane();
+            //Add bridge parts
+            // this.addBridge();
+            this.ground.addEventListener('collision', function (eventObject) {
+                if (eventObject.name === "Stone") {
+                    this.remove(eventObject);
+                    this.setStonePosition(eventObject);
+                }
+            }.bind(self));
+            this.ground1.addEventListener('collision', function (eventObject) {
+                if (eventObject.name === "Stone") {
+                    this.remove(eventObject);
+                    this.setStonePosition(eventObject);
+                }
+            }.bind(self));
+            this.ground2.addEventListener('collision', function (eventObject) {
+                if (eventObject.name === "Stone") {
+                    this.remove(eventObject);
+                    this.setStonePosition(eventObject);
+                }
+            }.bind(self));
+            this.ground3.addEventListener('collision', function (eventObject) {
+                if (eventObject.name === "Stone") {
+                    this.remove(eventObject);
+                    this.setStonePosition(eventObject);
+                }
+            }.bind(self));
+            this.ground4.addEventListener('collision', function (eventObject) {
+                if (eventObject.name === "Stone") {
+                    this.remove(eventObject);
+                    this.setStonePosition(eventObject);
+                }
+            }.bind(self));
+            this.ground5.addEventListener('collision', function (eventObject) {
+                if (eventObject.name === "Stone") {
+                    this.remove(eventObject);
+                    this.setStonePosition(eventObject);
+                }
+            }.bind(self));
+            this.ground6.addEventListener('collision', function (eventObject) {
+                if (eventObject.name === "Stone") {
+                    this.remove(eventObject);
+                    this.setStonePosition(eventObject);
+                }
+            }.bind(self));
+            this.ground7.addEventListener('collision', function (eventObject) {
+                if (eventObject.name === "Stone") {
+                    this.remove(eventObject);
+                    this.setStonePosition(eventObject);
+                }
+            }.bind(self));
+            // Collision Check with player
+            this.player1.addEventListener('collision', function (eventObject) {
+                if (eventObject.name === "Ground") {
+                    self.isGrounded = true;
+                    createjs.Sound.play("land");
+                }
+                if (eventObject.name === "Coin") {
+                    scoreValue += 500;
+                    self.scoreLabel.text = "SCORE: " + scoreValue;
+                    self.livesLabel.text = "LIVES: " + livesValue;
+                    self.remove(eventObject);
+                }
+                if (eventObject.name === "DeathPlane") {
+                    console.log(eventObject.name);
+                    createjs.Sound.play("Mine");
+                    livesValue--;
+                    if (livesValue <= 0) {
+                        // Exit Pointer Lock
+                        document.exitPointerLock();
+                        self.children = []; // an attempt to clean up
+                        self.player1.remove(camera);
+                        // Play the Game Over Scene
+                        currentScene = config.Scene.OVER;
+                        changeScene();
+                    }
+                    else {
+                        // otherwise reset my player and update Lives
+                        self.livesLabel.text = "LIVES: " + livesValue;
+                        self.remove(self.player1);
+                        self.player1.position.set(0, 7, 10);
+                        self.player1.rotation.set(0, 0, 0);
+                        self.add(self.player1);
+                    }
+                }
+                if (eventObject.name === "Stone") {
+                    console.log(eventObject.name);
+                    createjs.Sound.play("Mine");
+                    livesValue--;
+                    if (livesValue <= 0) {
+                        // Exit Pointer Lock
+                        document.exitPointerLock();
+                        self.children = []; // an attempt to clean up
+                        self.player1.remove(camera);
+                        // Play the Game Over Scene
+                        currentScene = config.Scene.OVER;
+                        changeScene();
+                    }
+                    else {
+                        // otherwise reset my player and update Lives
+                        self.livesLabel.text = "LIVES: " + livesValue;
+                        self.remove(self.player1);
+                        self.player1.position.set(0, 7, 10);
+                        self.player1.rotation.set(0, 0, 0);
+                        self.add(self.player1);
+                    }
+                }
+                if (eventObject.name === "Finish") {
+                    currentScene = config.Scene.INSTRUCTION3;
+                    changeScene();
+                }
+            }.bind(self));
+            camera.rotation.set(-0.45, 0, 0);
+            //camera.position.set(155, 150, 250);
+            camera.position.set(0, 15, 20);
+            this.player1.add(camera);
+            this.emplty = new Object3D();
+            this.emplty.name = "asda";
+            this.player1.add(this.emplty);
+            this.emplty.position.set(0, 0, -25);
+        };
+        /**
+         * Camera Look function
+         *
+         * @method cameraLook
+         * @return void
+         */
+        Play3.prototype.cameraLook = function () {
+            var zenith = THREE.Math.degToRad(-20);
+            var nadir = THREE.Math.degToRad(-20);
+            var cameraPitch = camera.rotation.x + this.mouseControls.pitch;
+            // Constrain the Camera Pitch
+            // camera.rotation.x = THREE.Math.clamp(cameraPitch, nadir, zenith);
+        };
+        /**
+         * @method update
+         * @returns void
+         */
+        Play3.prototype.update = function () {
+            this.checkControls();
+            this.stage.update();
+            this.setMinMaX();
+            if (!this.keyboardControls.paused) {
+                this.simulate();
+            }
+        };
+        /**
+         * Responds to screen resizes
+         *
+         * @method resize
+         * @return void
+         */
+        Play3.prototype.resize = function () {
+            canvas.style.width = "100%";
+            this.livesLabel.x = config.Screen.WIDTH * 0.1;
+            this.livesLabel.y = (config.Screen.HEIGHT * 0.15) * 0.20;
+            this.scoreLabel.x = config.Screen.WIDTH * 0.8;
+            this.scoreLabel.y = (config.Screen.HEIGHT * 0.15) * 0.20;
+            this.stage.update();
+        };
         return Play3;
     }(scenes.Scene));
     scenes.Play3 = Play3;
