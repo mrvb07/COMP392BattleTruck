@@ -704,7 +704,7 @@ var scenes;
                     }
                 }
                 if (eventObject.name === "Finish") {
-                    currentScene = config.Scene.INSTRUCTION3;
+                    currentScene = config.Scene.EXIT;
                     changeScene();
                 }
             }.bind(self));

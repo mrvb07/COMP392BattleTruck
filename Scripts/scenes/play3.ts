@@ -1031,7 +1031,7 @@ this.stones =  new Array<Physijs.ConvexMesh>();
                 }
 
                 if (eventObject.name === "Finish") {
-                    currentScene = config.Scene.INSTRUCTION3;
+                    currentScene = config.Scene.EXIT;
                     changeScene();
                 }
 
