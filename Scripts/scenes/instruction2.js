@@ -54,8 +54,8 @@ var scenes;
          */
         Instruction2.prototype._initialize = function () {
             // Create to HTMLElements
-            this._blocker = document.getElementById("blocker");
-            this._blocker.style.display = "none";
+            // this._blocker = document.getElementById("blocker");
+            // this._blocker.style.display = "none";
             // setup canvas for Instruction scene
             this._setupCanvas();
             // setup a stage on the canvas
@@ -90,13 +90,13 @@ var scenes;
         };
         Instruction2.prototype.setupScoreboard = function () {
             // Add Lives Label
-            this.livesLabel = new createjs.Text("LIVES: " + livesValue, "40px Algerian", "#ffffff");
+            this.livesLabel = new createjs.Text(" ", "40px Algerian", "#ffffff");
             this.livesLabel.x = config.Screen.WIDTH * 0.1;
             this.livesLabel.y = (config.Screen.HEIGHT * 0.15) * 0.20;
             this._stage.addChild(this.livesLabel);
             console.log("Added Lives Label to stage");
             // Add Score Label
-            this.scoreLabel = new createjs.Text("SCORE: " + scoreValue, "40px Algerian", "#ffffff");
+            this.scoreLabel = new createjs.Text("", "40px Algerian", "#ffffff");
             this.scoreLabel.x = config.Screen.WIDTH * 0.8;
             this.scoreLabel.y = (config.Screen.HEIGHT * 0.15) * 0.20;
             this._stage.addChild(this.scoreLabel);
@@ -115,7 +115,7 @@ var scenes;
             // Set Up Scoreboard
             this.setupScoreboard();
             // Scene changes for Physijs
-            this.name = "Instruction Scene 1";
+            this.name = "Instruction Scene 2";
             this.setGravity(new THREE.Vector3(0, 0, 0));
             //Adding Instruction sound
             createjs.Sound.stop();

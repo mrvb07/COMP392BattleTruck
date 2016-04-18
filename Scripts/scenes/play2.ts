@@ -505,9 +505,9 @@ module scenes {
                 if (this.isGrounded) {
                     if (this.keyboardControls.jump) {
                         this.velocity.y += 4000.0 * delta;
-                        if (this.player1.position.y > 4) {
-                            this.isGrounded = false;
-                        }
+                         if (this.player1.position.y > 4) {
+                             this.isGrounded = false;
+                         }
                     }
                 }
 

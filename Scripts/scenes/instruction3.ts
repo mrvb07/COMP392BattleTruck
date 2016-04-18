@@ -109,7 +109,7 @@ module scenes {
         private setupScoreboard(): void {
             // Add Lives Label
             this.livesLabel = new createjs.Text(
-                "LIVES: " + livesValue,
+                "",
                 "40px Algerian",
                 "#ffffff"
             );
@@ -120,7 +120,7 @@ module scenes {
 
             // Add Score Label
             this.scoreLabel = new createjs.Text(
-                "SCORE: " + scoreValue,
+                "",
                 "40px Algerian",
                 "#ffffff"
             );
@@ -142,15 +142,11 @@ module scenes {
             // setup the class context to use within events
             var self = this;
 
-
-
-
-
             // Set Up Scoreboard
             this.setupScoreboard();
 
             // Scene changes for Physijs
-            this.name = "Instruction Scene 1";
+            this.name = "Instruction Scene 3";
             this.setGravity(new THREE.Vector3(0, 0, 0));
 
             //Adding Instruction sound
@@ -232,10 +228,8 @@ module scenes {
          * @return void
          */
         public update(): void {
-
-
+            
             this._stage.update();
-
             this.simulate();
         }
 

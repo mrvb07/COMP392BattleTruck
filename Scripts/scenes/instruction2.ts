@@ -69,8 +69,8 @@ module scenes {
          */
         private _initialize(): void {
             // Create to HTMLElements
-            this._blocker = document.getElementById("blocker");
-            this._blocker.style.display = "none";
+            // this._blocker = document.getElementById("blocker");
+            // this._blocker.style.display = "none";
 
             // setup canvas for Instruction scene
             this._setupCanvas();
@@ -109,7 +109,7 @@ module scenes {
         private setupScoreboard(): void {
             // Add Lives Label
             this.livesLabel = new createjs.Text(
-                "LIVES: " + livesValue,
+                " " ,
                 "40px Algerian",
                 "#ffffff"
             );
@@ -120,7 +120,7 @@ module scenes {
 
             // Add Score Label
             this.scoreLabel = new createjs.Text(
-                "SCORE: " + scoreValue,
+                "",
                 "40px Algerian",
                 "#ffffff"
             );
@@ -146,7 +146,7 @@ module scenes {
             this.setupScoreboard();
 
             // Scene changes for Physijs
-            this.name = "Instruction Scene 1";
+            this.name = "Instruction Scene 2";
             this.setGravity(new THREE.Vector3(0, 0, 0));
 
             //Adding Instruction sound

@@ -69,7 +69,7 @@ var manifest = [
     { id: "land", src: "../../Assets/audio/turck_start.mp3" },
     { id: "hit", src: "../../Assets/audio/crash.mp3" },
     { id: "cheers", src: "../../Assets/audio/cheers.mp3" },
-    { id: "mine", src: "../../Assets/audio/Mine.mp3" },
+    { id: "Mine", src: "../../Assets/audio/Mine.mp3" },
     { id: "jump", src: "../../Assets/audio/Jump.wav" },
     { id: "menu", src: "../../Assets/audio/menu.mp3" },
     { id: "instruction", src: "../../Assets/audio/instructions.mp3" },
@@ -83,7 +83,9 @@ var manifest = [
     { id: "StartButton", src: "../../Assets/images/StartButton.png" },
     { id: "PlayAgainButton", src: "../../Assets/images/PlayAgainButton.png" },
     { id: "PlayButton", src: "../../Assets/images/PlayButton.png" },
-    { id: "ExitButton", src: "../../Assets/images/ExitButton.png" }
+    { id: "ExitButton", src: "../../Assets/images/ExitButton.png" },
+    { id: "destroy", src: "../../Assets/audio/destray.wav" },
+    { id: "box", src: "../../Assets/audio/pickupcoin.wav" }
 ];
 
 function preload(): void {

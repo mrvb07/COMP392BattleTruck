@@ -311,6 +311,28 @@ module scenes {
             this.spotLight2.shadowDarkness = 0.5;
             this.spotLight2.name = "Spot Light";
             this.add(this.spotLight2);
+
+
+            this.spotLight3 = new SpotLight(0xffffff);
+            this.spotLight3.position.set(347, 100, -104);
+            this.spotLight3.lookAt(new Vector3(347, 0, -104);
+            //this.spotLight3.rotation.set(0, 0, 0);
+            this.spotLight3.castShadow = true;
+            this.spotLight3.intensity = 2;
+            this.spotLight3.shadowCameraNear = 2;
+            this.spotLight3.shadowCameraFar = 200;
+            this.spotLight3.shadowCameraLeft = -5;
+            this.spotLight3.shadowCameraRight = 5;
+            this.spotLight3.shadowCameraTop = 5;
+            this.spotLight3.shadowCameraBottom = -5;
+            this.spotLight3.shadowMapWidth = 2048;
+            this.spotLight3.shadowMapHeight = 2048;
+            this.spotLight3.shadowDarkness = 0.5;
+            this.spotLight3.name = "Spot Light";
+
+            this.add(this.spotLight3);
+
+
         }
 
         /**
@@ -439,7 +461,9 @@ module scenes {
             this.playerc.receiveShadow = true;
             this.playerc.castShadow = true;
             this.playerc.name = "Player2";
+
             this.player1.add(this.playerc);
+            // this.playerc.add(this.spotLight3);
             console.log("Added Player1 to Scene");
 
             this.playerd = new Physijs.BoxMesh(this.playerGeometryc, this.playerMateriald, 1);
@@ -745,12 +769,12 @@ module scenes {
         // Add the Stone to the scene
         private addStoneMesh(): void {
 
-            this.stones =  new Array<Physijs.ConvexMesh>();  // Instantiate a convex mesh array
+            this.stones = new Array<Physijs.ConvexMesh>();  // Instantiate a convex mesh array
 
             var stoneLoader = new THREE.JSONLoader().load("../../Assets/imported/missile.json", function (geometry: THREE.Geometry) {
                 var phongMaterial = new PhongMaterial({ color: 0x736F6E });
                 phongMaterial.emissive = new THREE.Color(0x736F6E);
-this.stones =  new Array<Physijs.ConvexMesh>();
+                this.stones = new Array<Physijs.ConvexMesh>();
                 var stoneMaterial = Physijs.createMaterial((phongMaterial), 0.4, 0.6);
 
                 for (var count: number = 1; count < 7; count++) {
@@ -761,7 +785,7 @@ this.stones =  new Array<Physijs.ConvexMesh>();
                     this.stones[count].name = "Stone";
 
                     play3.setStonePosition(this.stones[1]);
-}
+                }
             });
 
             console.log("Added Stone Mesh to Scene");
@@ -954,6 +978,16 @@ this.stones =  new Array<Physijs.ConvexMesh>();
                 }
             }.bind(self));
 
+            this.deathPlane.addEventListener('collision', function (eventObject) {
+
+                if (eventObject.name === "Stone") {
+
+                    this.remove(eventObject);
+                    this.setStonePosition(eventObject);
+
+                }
+            }.bind(self));
+
             // Collision Check with player
             this.player1.addEventListener('collision', function (eventObject) {
 
@@ -967,7 +1001,7 @@ this.stones =  new Array<Physijs.ConvexMesh>();
 
 
                 if (eventObject.name === "Coin") {
-
+                    createjs.Sound.play("box");
                     scoreValue += 500;
                     self.scoreLabel.text = "SCORE: " + scoreValue;
                     self.livesLabel.text = "LIVES: " + livesValue;
@@ -983,6 +1017,7 @@ this.stones =  new Array<Physijs.ConvexMesh>();
                 }
 
                 if (eventObject.name === "DeathPlane") {
+
                     console.log(eventObject.name);
                     createjs.Sound.play("Mine");
                     livesValue--;
@@ -1046,7 +1081,7 @@ this.stones =  new Array<Physijs.ConvexMesh>();
             this.player1.add(camera);
 
             this.emplty = new Object3D();
-            this.emplty.name="asda";
+            this.emplty.name = "asda";
             this.player1.add(this.emplty);
             this.emplty.position.set(0, 0, -25);
 
@@ -1075,7 +1110,7 @@ this.stones =  new Array<Physijs.ConvexMesh>();
          */
         public update(): void {
 
-
+            this.spotLight3.lookAt(new Vector3(this.emplty.position.getComponent(0), this.emplty.position.getComponent(1), this.emplty.position.getComponent(2)));
             this.checkControls();
 
             this.stage.update();

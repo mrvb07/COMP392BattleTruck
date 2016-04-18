@@ -117,7 +117,7 @@ var scenes;
             // setup the class context to use within events
             var self = this;
             // Set Up Scoreboard
-            this.setupScoreboard();
+            //this.setupScoreboard();
             // Scene changes for Physijs
             this.name = "Instruction Scene 1";
             this.setGravity(new THREE.Vector3(0, 0, 0));

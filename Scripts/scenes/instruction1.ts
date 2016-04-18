@@ -148,7 +148,7 @@ module scenes {
             var self = this;
 
             // Set Up Scoreboard
-            this.setupScoreboard();
+            //this.setupScoreboard();
 
             // Scene changes for Physijs
             this.name = "Instruction Scene 1";
