@@ -26,7 +26,7 @@ module scenes {
 
         private spotLight: SpotLight;
         private spotLight2: SpotLight;
-        private spotLight3: SpotLight;
+        private spotLight3: PointLight;
         private spotLight4: SpotLight;
         private spotLight5: SpotLight;
         private spotLight6: SpotLight;
@@ -313,12 +313,11 @@ module scenes {
             this.add(this.spotLight2);
 
 
-            this.spotLight3 = new SpotLight(0xffffff);
-            this.spotLight3.position.set(347, 100, -104);
-            this.spotLight3.lookAt(new Vector3(347, 0, -104);
+            this.spotLight3 = new PointLight(0xffffff);
+            this.spotLight3.position.set(0, 15, 0);
             //this.spotLight3.rotation.set(0, 0, 0);
             this.spotLight3.castShadow = true;
-            this.spotLight3.intensity = 2;
+            this.spotLight3.intensity = 1;
             this.spotLight3.shadowCameraNear = 2;
             this.spotLight3.shadowCameraFar = 200;
             this.spotLight3.shadowCameraLeft = -5;
@@ -330,7 +329,7 @@ module scenes {
             this.spotLight3.shadowDarkness = 0.5;
             this.spotLight3.name = "Spot Light";
 
-            this.add(this.spotLight3);
+            
 
 
         }
@@ -420,6 +419,7 @@ module scenes {
             this.player1.castShadow = true;
             this.player1.name = "Player2";
             //this.player.add(this.player1);
+            this.player1.add(this.spotLight3);
 
             // Truck Bonet Object
             this.playerGeometrya = new BoxGeometry(5, 3, 3);
@@ -583,13 +583,13 @@ module scenes {
 
                 var direction = new Vector3(0, 0, 0);
                 if (this.keyboardControls.moveForward) {
-                    this.velocity.z -= 600.0 * delta;
+                    this.velocity.z -= 800.0 * delta;
                 }
                 if (this.keyboardControls.moveLeft) {
                     this.velocity.x -= 400.0 * delta;
                 }
                 if (this.keyboardControls.moveBackward) {
-                    this.velocity.z += 600.0 * delta;
+                    this.velocity.z += 800.0 * delta;
                 }
                 if (this.keyboardControls.moveRight) {
                     this.velocity.x += 400.0 * delta;
@@ -662,56 +662,56 @@ module scenes {
             this.ground1 = new Physijs.ConvexMesh(this.groundGeometry1, this.groundPhysicsMaterial, 0);
             this.ground1.receiveShadow = true;
             this.ground1.name = "Ground";
-            this.ground1.position.set(0, 0, -105);
+            this.ground1.position.set(0, 0, -115);
             this.add(this.ground1);
 
             this.groundGeometry2 = new BoxGeometry(100, 1, 32);
             this.ground2 = new Physijs.ConvexMesh(this.groundGeometry2, this.groundPhysicsMaterial, 0);
             this.ground2.receiveShadow = true;
             this.ground2.name = "Ground";
-            this.ground2.position.set(70, 0, -139);
+            this.ground2.position.set(80, 0, -149);
             this.add(this.ground2);
 
             this.groundGeometry3 = new BoxGeometry(32, 1, 100);
             this.ground3 = new Physijs.ConvexMesh(this.groundGeometry3, this.groundPhysicsMaterial, 0);
             this.ground3.receiveShadow = true;
             this.ground3.name = "Ground";
-            this.ground3.position.set(138, 0, -105);
+            this.ground3.position.set(158, 0, -115);
             this.add(this.ground3);
 
             this.groundGeometry4 = new BoxGeometry(100, 1, 32);
             this.ground4 = new Physijs.ConvexMesh(this.groundGeometry4, this.groundPhysicsMaterial, 0);
             this.ground4.receiveShadow = true;
             this.ground4.name = "Ground";
-            this.ground4.position.set(208, 0, -71);
+            this.ground4.position.set(238, 0, -81);
             this.add(this.ground4);
 
             this.groundGeometry5 = new BoxGeometry(32, 1, 100);
             this.ground5 = new Physijs.ConvexMesh(this.groundGeometry5, this.groundPhysicsMaterial, 0);
             this.ground5.receiveShadow = true;
             this.ground5.name = "Ground";
-            this.ground5.position.set(242, 0, -141);
+            this.ground5.position.set(272, 0, -161);
             this.add(this.ground5);
 
             this.groundGeometry6 = new BoxGeometry(100, 1, 32);
             this.ground6 = new Physijs.ConvexMesh(this.groundGeometry6, this.groundPhysicsMaterial, 0);
             this.ground6.receiveShadow = true;
             this.ground6.name = "Ground";
-            this.ground6.position.set(313, 0, -175);
+            this.ground6.position.set(353, 0, -195);
             this.add(this.ground6);
 
             this.groundGeometry7 = new BoxGeometry(32, 1, 100);
             this.ground7 = new Physijs.ConvexMesh(this.groundGeometry7, this.groundPhysicsMaterial, 0);
             this.ground7.receiveShadow = true;
             this.ground7.name = "Ground";
-            this.ground7.position.set(347, 0, -104);
+            this.ground7.position.set(377, 0, -104);
             this.add(this.ground7);
 
             this.groundGeometry8 = new BoxGeometry(32, 1, 32);
             this.ground8 = new Physijs.ConvexMesh(this.groundGeometry8, this.groundPhysicsMaterial, 0);
             this.ground8.receiveShadow = true;
             this.ground8.name = "Finish";
-            this.ground8.position.set(347, 0, -33);
+            this.ground8.position.set(377, 0, -33);
             this.add(this.ground8);
             console.log("Added Ground to scene");
         }
@@ -875,13 +875,13 @@ module scenes {
             this.addGround();
             // Add custom coin imported from Blender
             this.addCoinMesh(14, -14, 50, -50);
-            this.addCoinMesh(14, -14, -58, -153);
-            this.addCoinMesh(22, 118, -122, -153);
-            this.addCoinMesh(124, 152, -58, -153);
-            this.addCoinMesh(161, 257, -58, -85);
-            this.addCoinMesh(228, 250, -93, -189);
-            this.addCoinMesh(265, 361, -163, -189);
-            this.addCoinMesh(333, 361, -58, -151);
+            this.addCoinMesh(14, -14, -68, -163);
+            this.addCoinMesh(32, 128, -132, -163);
+            this.addCoinMesh(144, 172, -68, -163);
+            this.addCoinMesh(191, 287, -68, -95);
+            this.addCoinMesh(258, 280, -113, -209);
+            this.addCoinMesh(298, 390, -183, -209);
+            this.addCoinMesh(373, 390, -58, -151);
 
 
             this.addStoneMesh();
